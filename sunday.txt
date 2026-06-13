@@ -1,0 +1,64 @@
+from flask import Flask,jsonify,request
+
+app = Flask(__name__)  #in the line we initalize our flask app from Flask Class
+
+jobs = [
+]
+
+@app.route("/")
+def landing():
+    return jsonify([
+        {
+            "id":1,
+            "id":"Kia",
+        },
+        {
+            "id":1,
+            "name":"Honda",
+        },
+    ]) #can also return a list of objects
+
+@app.route("/jobs")
+def profile():
+    return jsonify(jobs)
+
+# #dynamic route
+# @app.route("/job/<int:id>")#dynamic route which act as a template
+# def test(id):
+#     for job in jobs:
+#         if job["id"] == id:
+#             return jsonify(job)
+
+@app.route("/job/<int:id>")#dynamic route which act as a template
+def test(id):
+    for job in jobs:
+        if job["id"] == id:
+            return jsonify(job)
+
+    return jsonify({
+        "error": "Job not found" #fallback for no job
+    })
+
+
+#keyword / filter "? -> is called as query parameter"
+@app.route("/search")
+def search():
+    keyword = request.args.get("keyword") #used to get the keyword
+    return f"You searched for {keyword}"
+
+
+@app.route("/postjob", methods=["POST"])
+def create_job():
+
+    data = request.get_json()
+    data["id"] = len(jobs)+1 #dynamically assign id
+    jobs.append(data)
+
+    return jsonify({
+        "message":"data added sucessfully !",
+        "job":data
+    })
+
+
+if __name__ == "__main__": #used to indicate the start (only starts if directly executed)
+    app.run(debug=True)
